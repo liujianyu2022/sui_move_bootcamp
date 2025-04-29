@@ -14,5 +14,9 @@ entry：控制Dapp（也就是命令行和前端）是否可以调用。没有�
 ![alt text](../images/02_baisc_03.png)
 
 所有权在函数之间传递的访问权限
-![alt text](../images/02_baisc_03.png)
+![alt text](../images/02_baisc_04.png)
+
+
+### 内置的4种能力
+![alt text](../images/02_baisc_05.png)
 
