@@ -12,21 +12,21 @@ public struct Bank has key {
     rmb: Balance<RMB>
 }
 
-// public struct Admin has key {
-//     id: UID
-// }
+public struct Admin has key {
+    id: UID
+}
 
-// fun init(ctx: &mut TxContext){
-//     let bank = Bank{
-//         id: object::new(ctx),
-//         rmb: balance::zero(),
-//         usd: balance::zero()
-//     };
+fun init(ctx: &mut TxContext){
+    let bank = Bank{
+        id: object::new(ctx),
+        rmb: balance::zero(),
+        usd: balance::zero()
+    };
 
-//     share_object(bank);
+    share_object(bank);
 
-//     let admin = Admin{
-//         id: object::new(ctx)
-//     };
-//     transfer(admin, ctx.sender());
-// }
+    let admin = Admin{
+        id: object::new(ctx)
+    };
+    transfer(admin, ctx.sender());
+}

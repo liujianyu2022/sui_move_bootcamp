@@ -1,7 +1,7 @@
 module hello_move::hello ;
 
-use std::ascii::{String, string};
 use sui::transfer::transfer;
+
 
 public struct Hello has key {
     id: UID,
@@ -15,5 +15,4 @@ fun init(ctx: &mut TxContext) {
     };
     transfer(hello_move, ctx.sender());
 }
-
 
