@@ -1,3 +1,42 @@
+### SUI 安装
+文档连接：https://docs.sui.io/guides/developer/getting-started/sui-install
+
+官方推荐使用 Homebrew 安装，比较简单，具体操作如下：
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"     // 安装 Homebrew
+
+brew install sui                                                                                    // 安装 SUI
+brew uninstall sui                                                                                  // 卸载 SUI
+
+which sui                                                                                           // 查找 SUI 的安装目录，结果为：/home/linuxbrew/.linuxbrew/bin/sui
+```
+
+### 插件安装
+在 vscode 中安装 Move 插件，当安装了如下插件之后，应该就可以有颜色高亮、语法提示、源码跳转的功能了。
+
+![alt text](../../images/01_hello_01.png)
+
+
+如果没有，那么在settings.json设置如下内容：
+关键点是 move.server.path 
+```
+{
+    "files.autoSave": "afterDelay",
+    "move.server.path": "/home/liujianyu/.sui/bin/move-analyzer",
+    "move.trace.server": "messages",
+    "files.associations": {
+        "*.move": "move"
+    },
+}
+```
+
+找到 move.server.path 的方法：OUTPUT -> Move Client
+![alt text](../../images/01_hello_02.png)
+
+跳转到 settings.json 的路径如下：Extensions -> Move -> Server Path -> Edit in settings.json
+![alt text](../../images/01_hello_03.png)
+
+
 ### sui move build
 在第一次执行该命令的时候，会安装Sui的依赖。安装的内容详见 `Move.toml` 中的 [dependencies] 
 安装在本地目录：/home/liujianyu/.move

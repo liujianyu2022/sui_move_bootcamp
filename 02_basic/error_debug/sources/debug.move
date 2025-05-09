@@ -4,7 +4,7 @@ use std::string;
 use std::string::String;
 use std::debug::print;
 
-public struct Person has drop{
+public struct Person has drop {
     name: String
 }
 
@@ -19,7 +19,7 @@ fun test_a(){
         name: string::utf8(b"xiaoming")
     };
 
-    print(&person);
+    // print(&person);
 }
 
 
