@@ -1,11 +1,11 @@
-module coin_owner::rmb;
+module coin_share::rmb;
 
 use std::option::none;
 use sui::url::Url;
 use sui::coin::create_currency;
 use sui::transfer::{
     public_freeze_object,
-    public_share_object
+    public_transfer
 };
 
 public struct RMB has drop {}
@@ -30,9 +30,7 @@ fun init(witness: RMB, ctx: &mut TxContext) {
     );
 
     public_freeze_object(metadata);
-    
-    // 所有人都能访问
-    public_share_object(treasury);
+    public_transfer(treasury, ctx.sender());
 }
 
 

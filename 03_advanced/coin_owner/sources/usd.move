@@ -5,7 +5,7 @@ use sui::url::Url;
 use sui::coin::create_currency;
 use sui::transfer::{
     public_freeze_object,
-    public_transfer
+    public_share_object
 };
 
 public struct USD has drop {}
@@ -30,6 +30,7 @@ fun init(witness: USD, ctx: &mut TxContext){
     );
 
     public_freeze_object(metadata);
-    public_transfer(treasury, ctx.sender());
 
+    // 所有人都能访问
+    public_share_object(treasury);
 }

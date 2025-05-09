@@ -20,10 +20,8 @@
 - 资产生命周期控制
     严格的类型转换确保资产不会"凭空消失"或"重复出现"
 ```
-// 存款流程
-Coin → (into_balance) → Balance // 原Coin被销毁
-// 取款流程 
-Balance → (from_balance) → Coin // 新Coin被创建
+Coin    → (into_balance) → Balance      // 存款流程   原Coin被销毁          
+Balance → (from_balance) → Coin         // 取款流程   新Coin被创建    
 ```
 - 性能优化
     Balance 的合并/拆分是纯数学运算，无需链上操作，只有转换为 Coin 时才需要全局状态更新
