@@ -5,6 +5,13 @@
 ```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"     // 安装 Homebrew
 
+=> Next steps:                                                                                      // 根据提示，将brew命令添加到 PATH。（下面命令分三次输入）
+- Run these commands in your terminal to add Homebrew to your PATH:
+    echo >> /home/liujianyu/.bashrc
+    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/liujianyu/.bashrc
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+
 brew install sui                                                                                    // 安装 SUI
 brew uninstall sui                                                                                  // 卸载 SUI
 
