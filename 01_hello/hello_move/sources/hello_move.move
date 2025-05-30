@@ -13,7 +13,7 @@ public struct Hello has key {
 fun init(ctx: &mut TxContext) {
     let hello_move = Hello {
         id: object::new(ctx),
-        say: string(b"move your github id"),
+        say: string::utf8(b"hello, move"),
     };
     transfer(hello_move, ctx.sender());
 }
