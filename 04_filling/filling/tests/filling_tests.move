@@ -1,11 +1,15 @@
 #[test_only]
 module filling::filling_tests;
 
-use filling::filling::{Self, Profile, ProfileCreated};
+use filling::filling::{Self, Profile, ProfileCreated, Folder};
+use filling::nft::{Self, Pet, Toy, Accessory};
 use sui::test_scenario::{Self};
-use std::string;
+use std::string::{Self, String};
 use filling::filling::State;
 use sui::test_utils::assert_eq;
+use sui::coin;
+use sui::sui::SUI;
+use std::address::length;
 
 // 测试函数没有参数和返回值
 #[test]
@@ -101,8 +105,140 @@ fun test_create_folder_wrap_coin(){
         test_scenario::return_shared(state);                                                // 使用 return_shared 归还对象
     };
 
-    test_scenario::next_tx(scenario, sender)
+    test_scenario::next_tx(scenario, user);
+    {
+        let mut profile = test_scenario::take_from_sender<Profile>(scenario);
+        filling::create_folder(
+            string::utf8(b"folder 01"),
+            string::utf8(b"folder 01"),
+            &mut profile,
+            test_scenario::ctx(scenario)
+        );
+
+        test_scenario::return_to_sender(scenario, profile);
+    };
+
+    test_scenario::next_tx(scenario, user);
+    {
+        let mut folder = test_scenario::take_from_sender<Folder>(scenario);
+        let coin = coin::mint_for_testing<SUI>(1000, test_scenario::ctx(scenario));
+
+        filling::add_coin_to_folder<SUI>(
+            &mut folder, 
+            coin, 
+            test_scenario::ctx(scenario)
+        );
+
+        test_scenario::return_to_sender(scenario, folder);
+    };
+
+    test_scenario::next_tx(scenario, user);
+    {
+        let folder = test_scenario::take_from_sender<Folder>(scenario);
+        assert_eq(
+            filling::get_balance<SUI>(&folder), 
+            1000
+        );
+        test_scenario::return_to_sender(scenario, folder);
+    };
+
+    // 结束测试
+    test_scenario::end(scenario_value);
 }
+
+#[test]
+fun test_create_folder_wrap_nft(){
+    let user = @0xa;
+    let mut scenario_value = test_scenario::begin(user);
+    let scenario = &mut scenario_value;
+
+     // 初始化测试环境
+    filling::init_for_testing(test_scenario::ctx(scenario));                   // 调用被测试模块的初始化函数
+    test_scenario::next_tx(scenario, user);                                 // 模拟开始一个新的事务
+
+    // 准备测试数据
+    let name = string::utf8(b"Bob");
+    let description = string::utf8(b"This is description");
+
+    // 执行被测试函数
+    {   
+        let mut state = test_scenario::take_shared<State>(scenario);         // 使用 take_shared 获取共享对象
+        filling::create_profile(
+            name, 
+            description, 
+            &mut state, 
+            test_scenario::ctx(scenario)
+        );
+
+        test_scenario::return_shared(state);                                                // 使用 return_shared 归还对象
+    };
+
+    test_scenario::next_tx(scenario, user);
+    {
+        let mut profile = test_scenario::take_from_sender<Profile>(scenario);
+        filling::create_folder(
+            string::utf8(b"folder 01"),
+            string::utf8(b"folder 01"),
+            &mut profile,
+            test_scenario::ctx(scenario)
+        );
+
+        test_scenario::return_to_sender(scenario, profile);
+    };
+
+    test_scenario::next_tx(scenario, user);
+    {
+        let name = string::utf8(b"dog");
+        let description: String = string::utf8(b"dog");
+        let category = string::utf8(b"Pet");
+        let image = string::utf8(b"image_url");
+        let ctx = test_scenario::ctx(scenario);
+
+        nft::mint_nft(
+            name, 
+            description, 
+            category, 
+            image, 
+            ctx
+        );
+    };
+
+    test_scenario::next_tx(scenario, user);
+    let pet_nft_object_address;
+    {
+        let mut folder = test_scenario::take_from_sender<Folder>(scenario);
+        let pet_nft = test_scenario::take_from_sender<Pet>(scenario);
+
+        pet_nft_object_address = object::id_to_address(
+            object::borrow_id(&pet_nft)
+        );
+
+        let ctx = test_scenario::ctx(scenario);
+
+        filling::add_nft_to_folder(
+            &mut folder, 
+            pet_nft, 
+            ctx
+        );
+
+        test_scenario::return_to_sender(scenario, folder);
+    };
+
+    test_scenario::next_tx(scenario, user);
+    {
+        let folder = test_scenario::take_from_sender<Folder>(scenario);
+
+        assert_eq(
+            filling::check_has_nft(&folder, pet_nft_object_address),
+            true
+        );
+
+        test_scenario::return_to_sender(scenario, folder);
+    };
+
+    test_scenario::end(scenario_value);
+}
+
 
 // test_scenario::begin() - 开始测试场景
 

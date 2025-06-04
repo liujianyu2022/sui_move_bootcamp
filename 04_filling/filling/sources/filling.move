@@ -6,7 +6,7 @@ use sui::transfer::{
     transfer,
     share_object
 };
-use sui::event;
+use sui::{event, dynamic_object_field};
 use sui::table::{Self, Table} ;
 use sui::coin::{Self, Coin};
 use sui::dynamic_field;
@@ -54,7 +54,27 @@ public struct CoinWrapped has copy, drop {
     new_balance: u64
 }
 
+public struct CoinUnWrapped has copy, drop {
+    folder: address,
+    coin_type: AString,
+    amount: u64,
+}
+
+public struct NFTWrapped has copy, drop {
+    folder: address,
+    nft: address,
+    nft_type: AString
+}
+
+public struct NFTUnWrapped has copy, drop {
+    folder: address,
+    nft: address,
+    nft_type: AString
+}
+
 const ErrorProfileExisted: u64 = 0x1;
+const ErrorCoinNotExisted: u64 = 0x2;
+const ErrorNFTNotExisted: u64 = 0x3;
 
 fun init(ctx: &mut TxContext){
     let state = State { 
@@ -135,6 +155,55 @@ public entry fun add_coin_to_folder<T>(folder: &mut Folder, coin: Coin<T>, ctx: 
     })
 }
 
+public entry fun add_nft_to_folder<T: key + store>(folder: &mut Folder, nft: T, ctx: &mut TxContext){
+    let type_name = type_name::get<T>();
+
+    let nft_object_address = object::id_to_address(
+        &object::id(&nft)
+    );
+
+    dynamic_object_field::add(&mut folder.id, nft_object_address, nft);
+
+    event::emit(NFTWrapped {
+        folder: object::uid_to_address(&folder.id),
+        nft: nft_object_address,
+        nft_type: type_name::into_string(type_name),
+    })
+
+}
+
+public fun remove_coin_from_folder<T>(folder: &mut Folder, type_name: TypeName, ctx: &mut TxContext): Coin<T>{
+    let existed: bool = dynamic_field::exists_(&folder.id, type_name);
+    assert!(existed, ErrorCoinNotExisted);
+
+    let balance = dynamic_field::remove<TypeName, Balance<T>>(&mut folder.id, type_name);
+    let coin = coin::from_balance(balance, ctx);
+
+    event::emit(CoinUnWrapped {
+        folder: object::uid_to_address(&folder.id),
+        coin_type: type_name::into_string(type_name),
+        amount: coin::value(&coin),
+    });
+
+    coin
+}
+
+public fun remove_nft_from_folder<T: key + store>(folder: &mut Folder, nft_object_address: address): T{
+    let existed: bool = dynamic_object_field::exists_(&folder.id, nft_object_address);
+    assert!(existed, ErrorNFTNotExisted);
+
+    let nft_object = dynamic_object_field::remove<address, T>(&mut folder.id, nft_object_address);
+    let type_name = type_name::get<T>();
+
+    event::emit(NFTUnWrapped {
+        folder: object::uid_to_address(&folder.id),
+        nft: nft_object_address,
+        nft_type: type_name::into_string(type_name),
+    });
+
+    nft_object
+}
+
 
 public fun check_has_peofile(state: &State, user_address: address): Option<address>{
     if(table::contains(&state.users, user_address)){
@@ -142,6 +211,10 @@ public fun check_has_peofile(state: &State, user_address: address): Option<addre
     } else {
         option::none()
     }
+}
+
+public fun check_has_nft(folder: &Folder, nft_object_address: address): bool{
+    dynamic_object_field::exists_(&folder.id, nft_object_address)
 }
 
 public fun get_balance<T>(folder: &Folder): u64{
