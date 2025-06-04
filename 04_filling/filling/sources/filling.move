@@ -204,7 +204,6 @@ public fun remove_nft_from_folder<T: key + store>(folder: &mut Folder, nft_objec
     nft_object
 }
 
-
 public fun check_has_peofile(state: &State, user_address: address): Option<address>{
     if(table::contains(&state.users, user_address)){
         option::some(*table::borrow(&state.users, user_address))
