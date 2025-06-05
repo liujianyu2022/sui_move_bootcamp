@@ -16,6 +16,9 @@ brew install sui                                                                
 brew uninstall sui                                                                                  // 卸载 SUI
 
 which sui                                                                                           // 查找 SUI 的安装目录，结果为：/home/linuxbrew/.linuxbrew/bin/sui
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"   // uninstall homebrew
+
 ```
 
 ### 插件安装
